@@ -1,0 +1,198 @@
+---------------------WITH ROLE----------------------------
+nfs.server.yml
+nfs.client.yml
+
+nfs.client
+	defaults
+	files
+		exports.template
+	handlers
+	meta
+	tasks
+	templates
+	vars
+nfs.server
+	defaults
+	files
+		exports.template
+	handlers
+	meta
+	tasks
+	templates
+	vars
+
+nfs.server.yml
+- hosts: nfsserver
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  pre_tasks:
+  - name: Start Time
+    command: date > /home/test/start_time_server.log
+  role:
+   - nfs.server
+  post_tasks:
+  - name: End Time
+    command: date > /home/test/end_time_server.log
+
+nfs.client.yml
+- hosts: nfsserver
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  pre_tasks:
+  - name: Start Time
+    command: date > /home/test/start_time_client.log
+  role:
+   - nfs.client
+  post_tasks:
+  - name: End Time
+    command: date > /home/test/end_time_client.log
+
+nfs.server/vars/main.yml
+distribution: {{ ansible_os_family }}
+nfsutils_pkg: nfs-utils
+nfslibs_pkg: nfs-utils-lib
+nfsserver_service: nfs-server
+nfslock_service: nfs-lock
+nfsmap_service: nfs-idmap
+rpcbind_service: rcpbind
+export_path: /var/share
+client_path: /mnt/remote
+
+nfs.server/tasks/main.yml
+- name:Install the nfs server, utils and libraries
+  yum: pkg={{ item }} state=latest
+  with_items:
+  - "{{ nfsutils_pkg }}"
+  - "{{ nfslibs_pkg }}"
+- name: Copy the export file to remote server
+  copy: src=exports.template dest=/etc/exports owner=root group=root mode=644
+  notify:
+  - StartServerServices
+
+nfs.server/handlers/main.yml
+- name: StartServerServices
+  service: name={{ item }} state=restarted
+  with_items:
+  - "{{ rpcbind_service }}"
+  - "{{ nfsserver_service }}"
+  - "{{ nfslock_service }}"
+  - "{{ nfsmap_service }}"
+
+nfs.client/vars/main.yml
+distribution: {{ ansible_os_family }}
+nfsutils_pkg: nfs-utils
+nfslibs_pkg: nfs-utils-lib
+nfsserver_service: nfs-server
+nfslock_service: nfs-lock
+nfsmap_service: nfs-idmap
+rpcbind_service: rcpbind
+export_path: /var/share
+client_path: /mnt/remote
+
+nfs.client/tasks/main.yml
+- name: Copy the export file to remote server
+  copy: src=exports.template dest=/etc/exports owner=root group=root mode=644
+  notify:
+  - InstallClientPackages
+  - CreateClientMount
+  - ClientMountServerResource
+
+nfs.client/handlers/main.yml
+- name:InstallClientPackages
+  yum: pkg={{ item }}state=latest
+  with_items:
+  - "{{ nfsutils_pkg }}"
+  - "{{ nfslibs_pkg }}"
+  notify: StartClientServices
+- name: StartClientServices
+  service: name={{ item }} state=restarted
+  with_items:
+  - "{{ rpcbind_service }}"
+  - "{{ nfslock_service }}"
+  - "{{ nfsmap_service }}"
+- name: CreateClientMount
+  file: path={{ client_path }} state=directory mode=755
+- name: ClientMountServerResource
+  mount: name=/mnt/remote src={{ export_path }} fstype=nfs state=present 
+  register: result
+
+ansible-playbook  nfs.server.yml --check
+ansible-playbook  nfs.client.yml --check
+
+----------------------------------------------------------------------------------------------------------------------------------
+#################WITHOUT ROLE###################################################################################################
+
+--- #NFS server playbook
+- hosts: nfs
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  vars:
+    distribution: {{ ansible_os_family }}
+	nfsutils_pkg: nfs-utils
+	nfslibs_pkg: nfs-utils-lib
+	nfsserver_service: nfs-server
+	nfslock_service: nfs-lock
+	nfsmap_service: nfs-idmap
+	rpcbind_service: rcpbind
+	export_path: /var/share
+	client_path: /mnt/remote
+  tasks:
+   - name:Install the nfs server, utils and libraries
+     yum: pkg={{ item }} state=latest
+	 with_items:
+	  - "{{ nfsutils_pkg }}"
+	  - "{{ nfslibs_pkg }}"
+   - name: Copy the export file to remote server
+     copy: src=files/exports.template dest=/etc/exports owner=root group=root mode=644
+	 notify:
+	 - StartServerServices
+	 - InstallClientPackages
+	 - CreateClientMount
+	 - ClientMountServerResource
+	 - TestServerAvailability
+  handlers:
+   - name: StartServerServices
+     service: name={{ item }} state=restarted
+	 with_items:
+	  - "{{ rpcbind_service }}"
+	  - "{{ nfsserver_service }}"
+	  - "{{ nfslock_service }}"
+	  - "{{ nfsmap_service }}"
+  - name:InstallClientPackages
+     yum: pkg={{ item }}state=latest
+	 with_items:
+	  - "{{ nfsutils_pkg }}"
+	  - "{{ nfslibs_pkg }}"
+	 deligate_to: 127.0.0.1
+	 notify: StartClientServices
+   - name: StartClientServices
+     service: name={{ item }} state=restarted
+	 with_items:
+	  - "{{ rpcbind_service }}"
+	  - "{{ nfslock_service }}"
+	  - "{{ nfsmap_service }}"
+      deligate_to: 127.0.0.1
+   - name: CreateClientMount
+     file: path={{ client_path }} state=directory mode=755
+	 deligate_to: 127.0.0.1
+   - name: ClientMountServerResource
+     mount: name=/mnt/remote src={{ export_path }} fstype=nfs state=present 
+	 register: result
+	 deligate_to: 127.0.0.1
+   - name: show the mount result
+     debug: var=result
+	 
+	
+	 
+exports.template
+/var/share nameofserver(rw,sync,no_root_squash,no_all_squash)
+
+
+In the client machine you can run the command to see mount dir
+]#df -h
