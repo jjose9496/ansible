@@ -1,0 +1,30 @@
+webstuff.yml
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  vars_files:
+  - variables/variables.yml
+  tasks:
+  - include: packages/packages.yml
+  - include: commands/commands.yml
+  handler:
+  - include: handler/handler.yml
+
+packages/packages.yml
+- name: install httpd
+  yum: pkg=httpd state=latest
+  notify: Restart HTTPD
+- name: install lynx
+  yum: pkg=lynx state=latest
+
+handler/handler.yml
+- name: Restart HTTPD
+  service: name=httpd state=restart
+
+commands/commands.yml
+- name: loging installed packages
+  command: yum list installed | grep lynx > /home/test/installed-pkg_list.yml
+
+variables/variables.yml
+version: 0.1

@@ -1,0 +1,16 @@
+plays/packages.yml
+- name: Install telnet package
+  yum: pkg=telnet state=latest
+- name: install lynx
+  yum: pkg=telnet state=latest
+
+include.yml
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+   - include: plays/packages.yml
+   - name: check telnet install check
+     raw: yum list install | grep telnet >> /home/test/installed_pkg.log

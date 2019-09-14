@@ -1,0 +1,21 @@
+Secure sensitive data in ansible using vault
+
+secure-file.yml //a variable file
+admin_user: admin
+admin_password: password#123
+
+To create sensitive data variable file
+]#ansible-vault create secure-file.yml
+
+
+To update the file
+]#ansible-vault edit secure-file.yml
+
+Create new password/key for the secure-file.yml file
+]#ansible-vault rekey secure-file.yml
+
+To un-encrypt the file secure-file.yml
+]# ansible-vault decrypt secure-file.yml
+
+To encrypt existing file
+]# ansible-vault encrypt secure-file.yml

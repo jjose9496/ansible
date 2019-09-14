@@ -1,0 +1,11 @@
+/etc/ansible/ansible.cfg -> default
+
+you can override by copying/creating ansible.cfg  in your specific folder
+or by setting ANSIBLE_CONFIG
+export ANSIBLE_CONFIG= /home/test/mylab/ansible.cfg
+
+Ansible .cfg order of presidence 
+	1. Env variable
+	2. Current directory
+	3. Home folder of user who runnig the command /home/test/.ansible.cfg
+	4. /etc/ansible/ansible.cfg

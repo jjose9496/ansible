@@ -1,0 +1,34 @@
+reate a playbook, using the 'find' module that accomplishes the following:
+- Uses SSH
+- Logs in to the remote system as 'test' user
+- Connects to one server or group from Step #2 above
+- The playbook runs as 'sudo'
+- Skip gathering remote facts
+- Search the remote system /etc directory for the fstab file
+- Capture the resulting file characteristics into a variable called 'results'
+- Output the captured results in JSON format when the playbook is run
+find.yml 
+--- # ANSIBLE 2.0 FIND MODULE EXAMPLE
+- hosts: appserver
+  remote_user: test
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tasks:
+  - name: Simple find on fstab file
+    find: paths="/etc" patterns="fstab" 
+    register: result
+  - debug: var=result
+ 
+-------------------------
+--- # ANSIBLE 2.0 FIND MODULE EXAMPLE
+- hosts: appserver
+  remote_user: test
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  tasks:
+  - name: find the file
+    find: paths="/var/log" age="1d" recurse="yes" size="100K" patterns="*.log"
+	register: result
+  - debug: var=result

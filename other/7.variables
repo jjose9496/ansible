@@ -1,0 +1,25 @@
+]#mkdir playbook
+]#cd playbook
+vi appserver.yml
+	- hosts: appserver
+	  vars:
+	    control_server: myansibleserver.com
+		web_root: /var/www/html
+	  tasks: 
+	  - name: install Lynx on AppServer
+	    yum: pkg=lynx state=installed update_cache=true
+
+or 
+appserver.yml
+	- hosts: appserver
+	  vars:
+	    admin_user: savio
+	  vars_files:
+	  - vars.yml
+	  tasks: 
+	  - name: install Lynx on AppServer
+	    yum: pkg=lynx state=installed update_cache=true
+
+vars.yml
+control_server: myansibleserver.com
+web_root: /var/www/html

@@ -1,0 +1,10 @@
+--- # ANSIBLE 2.0 PACKAGE MODULE DEMO
+- hosts: all
+  remote_user: test
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  tasks:
+  - name: Install Telnet Client on ALL Distribution Types
+    package: name=telnet state=present

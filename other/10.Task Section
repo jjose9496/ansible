@@ -1,0 +1,31 @@
+myfirstplaybook.yml
+
+--- #myfirstplaybook
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  vars:
+    playbook_version: 0.1
+  vars_files:
+    - conf/copyright.yml
+	- conf/webdefaults.yml
+  vars_prompt:
+    - name: web_domain
+	  prompt: Web Domain
+  tasks:
+    - name: installing lynx web browser
+	  action: yum name=lynx state=installed
+	- name: check for telnet client
+	  action: yum name=telnet state=absent
+
+conf/copyright.yml
+---
+message: copyrght 2018
+author: savio
+
+conf/webdefaults.yml
+---
+apache_version: 2.6
+apache_mod_req: mod_ssl

@@ -1,0 +1,12 @@
+- hosts: all
+  user: test
+  sudo: yes
+  gather_facts: no
+  connection: ssh
+  tasks:
+    - name: excuting a wrong command
+	  command: /bin/abcd 				//since the command will get fail playbook excution will stop normally 
+	  ignore_errors: yes 				// not to skip the excution and continue we use ignore_errors
+	- name: install telnet
+	  yum: pkg=telnet state=latest
+  

@@ -1,0 +1,10 @@
+user.yml
+--- # USER MODULE EXAMPLE
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  gather_facts: no
+  connection: ssh
+  tasks:
+    - name: Add the user called savio
+      user: name=savio comment="tst user" uid=1010 shell=/bin/bash groups=wheel append=yes

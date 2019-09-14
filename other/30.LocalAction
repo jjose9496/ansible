@@ -1,0 +1,11 @@
+---
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  gather_info: no
+  connection: ssh
+  tasks:
+    - name: Ping the application server before doing installation
+	  local_action: command ping -c 4 appserver1
+	- name: install telnet
+	  yum: pkg=telnet state=latest

@@ -1,0 +1,17 @@
+webservers.yml
+roles/
+   common/
+   ubuntu_webservers/
+   redhat_webservers/
+
+
+webservers.yml
+--- # Master Playbook for Web Servers
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  roles:
+  - { role: redhat_webservers, when: "ansible_os_family == 'RedHat'" }
+  - { role: ubuntu_webservers, when: "ansible_os_family == 'Debian'" }
+

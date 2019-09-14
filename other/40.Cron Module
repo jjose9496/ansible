@@ -1,0 +1,12 @@
+reates a cron job, as the test user, that lists the contents of /var/log on the remote system at 1am every day, and logs the output to a file in /home/test called 'cron.log'. Name the job 'list dirs' as part of the command.
+
+--- # CRON MODULE EXAMPLE
+- hosts: apacheweb
+  user: test
+  connection: ssh
+  gather_facts: no
+  tasks:
+    - name: Add a CRON Job to the Test User
+      cron: name="list dirs" minute="0" hour="1" job="ls -al /var/log > /home/test/cron.log"
+	- name: Remove a cron job
+	  cron: name="list files" state=absent    // this will delete cron with name list files

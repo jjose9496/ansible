@@ -1,0 +1,13 @@
+fromcmdline.yml 
+---
+- hosts: '{{ hosts }}'
+  user: '{{user}}'
+  sudo:  yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+  - name: install package
+    yum: pkg={{ pkg_name }} state=latest
+
+]#ansible-playbook fromcmdline.yml 	--extra-vars "hosts=apacheweb user=test pkg_name=telnet"
+  

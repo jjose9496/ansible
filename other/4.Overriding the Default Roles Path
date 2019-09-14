@@ -1,0 +1,8 @@
+Overriding the Default Roles Path
+---------------------------------
+you can define role in ansible.cfg file
+roles_path    = /etc/ansible/roles
+
+to add multiple role folder
+roles_path    = /etc/ansible/roles1:/etc/ansible/roles2
+

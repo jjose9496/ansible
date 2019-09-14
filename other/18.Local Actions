@@ -1,0 +1,10 @@
+--- #Playbook for localhost
+- hosts: 127.0.0.1
+  connection: local
+  sudo: yes
+  tasks:
+    - name: install telnet client
+	  yum: pkg=telnet state=latest
+
+	  
+or via command line: ansible-playbook <playbook.yml> --connection=local

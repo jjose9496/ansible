@@ -1,0 +1,15 @@
+---  #Conditional state
+- hosts: apacheweb
+  sudo: yes
+  user: test
+  connection: ssh
+  tasks:
+    - name: install apache to Dibian
+	  apt: name=apache2 state=latest
+	  when: ansible_os_family = "Debian"
+	- name: install httpd on redhat
+	  yum: name=httpd state=latest
+	  when: ansible_os_family ="Redhat"
+	 
+	 
+ansible all -m setup -a 'filter=ansible_os_family'

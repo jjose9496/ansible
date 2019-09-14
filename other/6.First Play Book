@@ -1,0 +1,9 @@
+]#mkdir playbook
+]#cd playbook
+vi appserver.yml
+	- hosts: appserver
+	  tasks: 
+	  - name: install Lynx on AppServer
+	    yum: pkg=lynx state=installed update_cache=true
+		
+]#ansible-playbook -s appserver.yml

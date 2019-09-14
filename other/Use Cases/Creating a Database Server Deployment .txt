@@ -1,0 +1,153 @@
+---------------------WITH ROLE----------------------------
+mariadb.server.yml
+mariadb.client.yml
+
+mariadb.client
+	defaults
+	files
+		exports.template
+	handlers
+	meta
+	tasks
+	templates
+	vars
+
+mariadb.server
+	defaults
+	files
+		mysqlbackup.sql
+	handlers
+	meta
+	tasks
+
+mariadb.server.yml
+--- #DB deployment
+- hosts: appserver
+  user: test
+  connection: ssh
+  sudo: yes
+  gather_facts: yes
+  pre_tasks:
+  - name: Start Time
+    command: date > /home/test/start_time_client.log
+  role:
+   - mariadb.server.yml
+  post_tasks:
+  - name: End Time
+    command: date > /home/test/end_time_client.log
+
+
+	
+mariadb.server/vars/main.yml
+dbserver_pkg: mariadb-server
+dbclient_pkg: mariadb
+dbserver_fqdn: myserver.com
+dbinstalldir: /var/lib
+dbinstancename: MyDBTest
+dbdistribution: {{ ansible_os_family }}
+dbversion: 5.5.44
+
+
+mariadb.server/tasks/main.yml
+- name: Install all Mariadb packages (Client and server)
+  yum: pkg={{ item }} state=latest
+  with_items:
+    - "{{ dbclient_pkg }}"	
+	- "{{ dbserver_pkg }}"
+  notify:
+  - StartDBService
+  - RunSecureInstallPause
+  - RestartDBService
+  - CopyBackupFile
+  - CreateRemoteDB
+  - DisplayCreationResult
+  - RestoreRemoteDB
+  - TestDBResults
+  - ShowDBResults
+  - name: DB backup cron everday night
+    cron: name="DBbackup" minute="0" hour="0" job="mysqldump" -u root -ppassword123 --database {{ dbinstancename }} > dbbkup.sql
+
+
+mariadb.server/handlers/main.yml
+- name: StartDBService
+  service: name={{ dbclient_pkg }} state=started
+- name: RunSecureInstallPause
+  pause: prompt="Please run the mysql_secure installation binary and then press enter For the playbook to continue"
+- name: RestartDBService
+  service: name={{ dbclient_pkg }} state=restarted
+- name: CopyBackupFile
+  copy: src=mysqlbackup.sql dest={{ dbinstalldir }}/mysqlbackup.sql owner=root group=root mode=755
+- name: CreateRemoteDB
+  shell: mysqladmin -u root -ppassword123 create {{ dbinstancename }}
+  register: result
+- name: DisplayCreationResult
+  debug: var=result
+- name: RestoreRemoteDB
+  shell: mysql -u root -p password123 {{ dbinstancename }} < {{ dbinstalldir }}/mysqlbackup.sql
+  register: result
+- name: TestDBResults
+  shell: mysql -u root -ppassword123 -e 'SHOW DATABASES;'
+  register: mysqlresult
+- debug: var=mysqlresult
+  
+
+--------------------------------------------------------------------
+################################With OUT ROLE#######################
+--- #DB deployment
+- hosts: appserver
+  user: test
+  connection: ssh
+  sudo: yes
+  gather_facts: yes
+  vars:
+    dbserver_pkg: mariadb-server
+	dbclient_pkg: mariadb
+	dbserver_fqdn: myserver.com
+	dbinstalldir: /var/lib
+	dbinstancename: MyDBTest
+	dbdistribution: Redhat
+	dbversion: 5.5.44
+  tasks:
+  - name: Install all Mariadb packages (Client and server)
+    yum: pkg={{ item }} state=latest
+	with_items:
+        - "{{ dbclient_pkg }}"	
+		- "{{ dbserver_pkg }}"
+	notify:
+	  - StartDBService
+	  - RunSecureInstallPause
+	  - RestartDBService
+	  - CopyBackupFile
+	  - CreateRemoteDB
+	  - DisplayCreationResult
+	  - RestoreRemoteDB
+	  - TestDBResults
+	  - ShowDBResults
+  - name: DB backup cron everday night
+    cron: name="DBbackup" minute="0" hour="0" job="mysqldump" -u root -ppassword123 --database {{ dbinstancename }} > dbbkup.sql
+  handlers:
+  - name: StartDBService
+    service: name={{ dbclient_pkg }} state=started
+  - name: RunSecureInstallPause
+    pause: prompt="Please run the mysql_secure installation binary and then press enter For the playbook to continue"
+  - name: RestartDBService
+    service: name={{ dbclient_pkg }} state=restarted
+  - name: CopyBackupFile
+    copy: src=files/mysqlbackup.sql dest={{ dbinstalldir }}/mysqlbackup.sql owner=root group=root mode=755
+  - name: CreateRemoteDB
+    shell: mysqladmin -u root -ppassword123 create {{ dbinstancename }}
+	register: result
+  - name: DisplayCreationResult
+    debug: var=result
+  - name: RestoreRemoteDB
+    shell: mysql -u root -p password123 {{ dbinstancename }} < {{ dbinstalldir }}/mysqlbackup.sql
+	register: result
+  - name: TestDBResults
+    shell: mysql -u root -ppassword123 -e 'SHOW DATABASES;'
+	register: mysqlresult
+  - debug: var=mysqlresult
+  
+  
+once the prompt come go to the server and run, set password123
+sudo mysql_secure_installation
+

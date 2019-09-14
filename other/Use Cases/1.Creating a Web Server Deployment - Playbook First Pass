@@ -1,0 +1,37 @@
+--- #Apache web server
+- hosts
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  vars:
+    apache_pkg: httpd
+	distribution: "{{ ansible_os_family }}"
+	apache_version: 2.4
+	apache_dir: /var/www/myapache/
+	apache_fqdn: ansiblelab.com
+  tasks:
+    - name: Install httpd
+	  yum: pkg={{ apache_pkg }} state=latest
+	- name: create web server directory
+      file: path={{ apache_dir }}state=directory mode=644
+    - name: copy apache conf to webserver
+      copy: src=files/httpd.conf.template dest=/etc/httpd/conf/httpd.conf owner=root group=root mode=644
+    - name: Create Vhost directory
+      file: path=/etc/httpd/mywebsite state=directory mode=644
+    - name: copy and untar source for site
+      unarchive: src=files/sitecode.tar.gz dest={{ apache_dir }}
+    - name: copy default vhost conf	  
+      copy: src=files/default.conf.template dest=/etc/httpd/mywebsite/default.conf owner=root group=root mode=644
+	  notify: 
+	    - start HTTPD
+		- TestHTTPD
+		- DisplayResult
+  handler:	  
+	- name: start HTTPD
+	  service: name={{ apache_pkg }} state=started
+	- name: TestHTTPD
+	  shell: curl http://{{ apache_fqdn }}
+	  register: result
+	- name: Display curl result
+	  debug: var=result

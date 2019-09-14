@@ -1,0 +1,6 @@
+--- #My first YAML file
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh  //way of connecting to server ssh or paramiko
+  gather_facts: no

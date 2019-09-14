@@ -1,0 +1,15 @@
+---
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  vars_prompt:
+    - name:packagetoinstall
+	  prompt: Install which package?
+	  default: telnet
+	  private: no // which will display the package which you are typing in the prompt
+  tasks:
+    - name: installing package
+	  yum: pkg={{packagetoinstall}} state=latest
+   

@@ -1,0 +1,51 @@
+main.yml
+webservers.yml
+appserver.yml
+common.yml
+roles/
+   common/
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+   webservers/
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+   appserver
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+
+webservers.yml
+--- #master playbook
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  roles:
+   - webservers
+  
+  
+tasks/main.yml
+- name: install apache
+  yum: apk=httpd state=latest
+  notefy: Restart HTTPD
+
+handlers/main.yml
+- name: Restart HTTPD
+  service: name=httpd state=restart
+
+vars/main.yml
+copright_msg: copyright 2015

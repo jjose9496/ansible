@@ -1,0 +1,19 @@
+mysqldb.yml 
+#Add or remove MySQL databases from a remote host.
+--- # MYSQL_DB MODULE DEMO
+- hosts: appserver
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: yes
+  tasks:
+  - name: Install the Python MySQL Support Libraries
+    yum: pkg=MySQL-python state=latest
+  - name: Create a New Test DB called MyNewDB
+    mysql_db: name=MyNewDB state=present login_user=root login_password=password123
+  - name: Drop DB MyNewDB
+    mysql_db: name=MyNewDB state=present login_user=root login_password=password123
+  - name: Take a dump of database MyNewDB
+    mysql_db: name=MyNewDB state=dump target/tmp/MyNewDB-dump.sql login_user=root login_password=password123
+  - name:  Restore database
+    mysql_db: name=MyNewDB state=import target=/tmp/dump.sql.bz2

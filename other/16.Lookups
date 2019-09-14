@@ -1,0 +1,15 @@
+mylookup.yaml
+---
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+    - debug: msg="Lookup the super hero Bruce wayne{{ lookup('csvfile', 'Bruce Wayne file=lookup.csv delimiter=, default=NOMATCH-FOUND')}}" //by default second column of match will be displayed if nothing matched NOMATCH-FOUND will msged
+	- debug: msg="Checking env value {{lookup('env', 'HOME')}}" //which will displaye value enironment variable HOME
+	
+lookup.csv
+Bruce Wayne, Batman, Human
+Clark Kent, Superman, Alien
+	

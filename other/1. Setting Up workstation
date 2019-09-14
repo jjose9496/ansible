@@ -1,0 +1,15 @@
+Setting up workstation
+----------------------
+1. Create a new user in each node
+	]#adduser test // all add test user to with root privilages #visudo
+2. Create a folder to store playbook
+	]#mkdir /home/test/playbook
+3. Pass ssh key between all the 3 nodes.
+	]#ssh-keygen -t rsa
+	]#su test
+	]#ssh-copy-id <other-machines> / also ssh-copy-id localhost.localdomain ssh-copy-id localhost
+4. Install ansible
+	yum install epel-release -y
+	yum update repolist -y
+	yum update
+	yum install ansible 

@@ -1,0 +1,10 @@
+etch.yml
+This module works like copy, but in reverse. It is used for fetching files from remote machines and storing them locally in a file tree, 
+--- # FETCH MODULE EXAMPLE
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  tasks:
+    - name: Copy remote hosts file to control server
+      fetch: src=/etc/hosts dest=/home/test/prefix-{{ ansible_hostname }} flat=yes  //flat=yes  for copy file alone not entire folder

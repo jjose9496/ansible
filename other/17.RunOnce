@@ -1,0 +1,12 @@
+---
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks: 
+    - name: execute date command in all nodes and log it
+	  raw: /usr/bin/date >> /home/test/date.info
+	- name: execute ps command and log it
+	  raw: ps -aux >> /home/test/running_process.info
+	  run_once: true // the command will then execute only in the first node in hosts file {]#ansible all --list-hosts}

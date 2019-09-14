@@ -1,0 +1,19 @@
+start.yml
+---
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+	- name: install httpd
+	  yum: pkg=httpd state=latest
+	- name: install lynx
+	  yum: pkg=lynx state=latest
+	- name: list home folder
+	  shell: ls -al /home/test
+	  register: result
+	- debug: var=result
+
+]#ansible-playbook start.yml --start-at-task='install httpd' 	//now only the httpd installion will happen
+]# ansible-playbook start.yml --step		 // which will promnt for yes/no for every tasks

@@ -1,0 +1,14 @@
+dnf.yml --> DNF which is package manager in RHEL 7 and later
+--- # DNF MODULE EXAMPLE
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  gather_facts: no
+  tasks:
+    - name: DNF Update
+      dnf: name="@Development tools" state=present
+	- name: install APache using DNF
+	  dnf: name=httpd state=latest
+	- name: remove telnet
+	  dnf: name=telnet state=absent

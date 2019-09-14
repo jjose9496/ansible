@@ -1,0 +1,18 @@
+/etc/ansible/hosts 
+[local]
+localhost
+
+[apacheweb]
+jomonjose2.mylabserver.com
+
+[appserver]
+jomonjose3.mylabserver.com
+
+To list all hosts configured in hosts file
+ansible all --list-hosts
+
+To ping a host
+ansible jomonjose3.mylabserver.com -m ping
+
+override default hosts file using -i (/etc/ansible/hosts)
+ansible appserver -i hosts -m ping

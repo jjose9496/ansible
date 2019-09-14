@@ -1,0 +1,13 @@
+adduser test
+passwd test
+visudo configuration as sudo user
+generay keygen
+ssh-copy-id  test@server2
+yum install epel-release
+yum update -y
+yum install ansible -y
+yum remove ansible
+git clone git://githum.com/ansible/ansible.git --recursive
+cd ansible
+make
+make install

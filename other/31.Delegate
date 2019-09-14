@@ -1,0 +1,11 @@
+--- # DELEGATE TO PLAYBOOK
+- hosts: apacheweb
+  user: test
+  sudo: yes
+  connection: ssh
+  tasks:
+    - name: Install Telnet Client
+      yum: pkg=telnet state=latest
+      delegate_to: 127.0.0.1  // since the delegate_to is pointing local host command execution will happen only on localhost not in apacheweb
+	- name: touch a file
+	  command: touch /tmp/sample.txt // This will create a sample.txt in all of the apacheweb server grp

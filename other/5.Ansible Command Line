@@ -1,0 +1,35 @@
+Ansible Command Line
+--------------------
+ansible all --list-hosts -> to listout all hosts in hosts file
+ansible app1 --list-hosts
+
+ansible app1 -s -m shell -a 'yum list installed | grep python '
+
+ansible local -m setup | more 
+
+ansible local -m setup --tree /tmp/facts --> gather system facts and write to a file 
+
+ansible local -m setup -a 'filter=ansible_ip*' -> adding filter in system facts
+
+ansible local -m setup -a 'filter=ansible_memtotal_mb' ->
+
+ansible local -m setup -a 'filter=ansible_proc*' ->
+
+ansible local -m setup -a 'filter=ansible_interfaces'->
+
+ansible local -m setup -a 'filter=ansible_kernel' ->
+
+ansible local -u test -s -m yum -a 'pkg=lynx state=installed update_cache=true'
+
+ansible -i hosts.ini -u test -s -m yum -a 'pkg=lynx state=installed update_cache=true'
+
+ansible redhat -u test -s -m user -a "name=johnsmith uid=25001 shell=/bin/bash" --> addng user
+
+ansible redhat -u test -s -m user -a "name=johnsmith state=absent remove=yes" --> remove user
+
+ansible redhat -u test -s -m cron -a "name='crontest' minute='0' hour='12' job='ls -al /var > /root/var.log'" --> ading a cron
+
+ansible redhat -u test -s -m cron -a "name='crontest' state='absent'" --> remove a cron
+
+
+ansible local -u test -s -m yum -a "pkg=lynx state=installed update_cache=true" -t date_ansible_log --> execution output in jason on the folder date_ansible_log in each machine

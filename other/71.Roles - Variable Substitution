@@ -1,0 +1,71 @@
+main.yml
+webservers.yml
+appserver.yml
+common.yml
+roles/
+   common/
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+   webservers/
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+   appserver
+     tasks/
+     handlers/ -> service restart
+     files/
+     templates/  --> jinja2 python formated files eg: httpd conf
+     vars/
+     defaults/
+     meta/
+
+webservers.yml
+--- #master playbook
+- hosts: all
+  user: test
+  sudo: yes
+  connection: ssh
+  pre_tasks:
+   - name:  When did the role start
+     raw: date > /home/test/role_sart.log
+  roles:
+   - webservers
+  post_tasks:
+   - name: when the role end
+     raw: date > /home/test/role_end.log
+
+tasks/main.yml
+---  #Conditional state
+- hosts: apacheweb
+  sudo: yes
+  user: test
+  connection: ssh
+  tasks:
+    - name: install apache to Dibian
+	  apt: name={{ dibian_pkg }} state=latest  //no need of any include statement in main yaml file
+	  when: ansible_os_family = "Debian"
+	  notefy: Restart apache2
+	- name: install httpd on redhat
+	  yum: name={{ redhat_pkg }} state=latest
+	  when: ansible_os_family ="Redhat"
+	  notefy: Restart HTTPD
+
+handlers/main.yml
+- name: Restart HTTPD
+  service: name={{ redhat_pkg }} state=restart
+- name: Restart apache2
+  service: name={{ dibian_pkg }} state=restart
+
+vars/main.yml
+copright_msg: copyright 2015
+dibian_pkg: apache2
+redhat_pkg: httpd
